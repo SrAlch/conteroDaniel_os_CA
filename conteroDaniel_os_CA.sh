@@ -1,4 +1,5 @@
 #!/bin/bash
+# GitHub repo 
 file_input=$1
 
 backupCheckUp() {
@@ -53,7 +54,7 @@ getFileContent() {
     then
         readBackupFile "$user_path"
     else
-        echo "$user_name could not be found"
+        echo "$user_name user could not be found"
     fi
 }
 
