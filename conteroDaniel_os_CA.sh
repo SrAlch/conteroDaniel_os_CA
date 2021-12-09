@@ -22,6 +22,7 @@ checkAndCreateFile() {
 
 readBackupFile() {
     local user_path=$1
+    local user_name=$2
     local file_name=".backup"
     local file_path="${user_path}${file_name}"
     if [ -f "$file_path" ]
@@ -43,7 +44,7 @@ readBackupFile() {
         #backup exits?
         #movebackup
     else
-        echo "Create file"
+        echo "Create .backup file"
     fi
 }
 
@@ -52,10 +53,23 @@ getFileContent() {
     local user_path="/home/${user_name}/"
     if [ -d "$user_path" ]
     then
-        readBackupFile "$user_path"
+        readBackupFile "$user_path" "$user_name"
     else
         echo "$user_name user could not be found"
     fi
+}
+
+backupExtract() {
+    local backup_path="/var/backup.tar.gz"
+    local extract_path="/tmp/backup"
+    local bool_exist=false
+
+    if ! [ -d "$extract_path" ]
+    then
+        mkdir "$extract_path"
+    fi
+
+    if [ -f "" ]
 }
 
 while IFS= read -r line || [ -n "$line" ]
