@@ -1,22 +1,27 @@
 #!/bin/bash
-# GitHub repo 
-file_input=$1
-
-backupCheckUp() {
-    backup_path="/var/backup.tar.gz"
-    extract_path=""
-    if [ -f "$backup_path" ]
-    then
-        tar -xf "$backup_path" -C "$extract_path"
-    fi
-}
+# GitHub repo: git@github.com:SrAlch/conteroDaniel_os_CA.git
 
 checkAndCreateFile() {
     local file_path=$1
     if ! [ -f "$file_path" ]
     then
+        echo -e "       File couldn't be found, creating it with zero-lenght  $file_path"
         #mkdir -p -- "${file_path%/*}" && touch -- "$file_path"
-        echo "Create $file_path"
+        
+    else
+        echo -e "       This file already exist  $file_path"
+    fi
+}
+
+fileComparing() {
+    local file_name=$1
+    local tmp_user="$extract_path/$2"
+
+    if [ -f "$tmp_user/" ]
+    then
+        echo "test"
+    else
+        echo "test"
     fi
 }
 
@@ -27,6 +32,7 @@ readBackupFile() {
     local file_path="${user_path}${file_name}"
     if [ -f "$file_path" ]
     then
+        echo -e "   $file_name file found $file_path"
         cd "$user_path" || exit
         while IFS= read -r line || [ -n "$line" ]
         do 
@@ -34,17 +40,16 @@ readBackupFile() {
             if [ "${line:0:1}" == "." ]
             then
                 checkAndCreateFile "$line"
+                fileComparing "$line" "$user_name"
             elif [ "${line:0:1}" == "~" ]
             then
-                abs_path="${user_path}${line:2}"
+                local abs_path="${user_path}${line:2}"
                 checkAndCreateFile "$abs_path"
             fi           
         done < "$file_path"
-        #tar -cvf ./backup.tar.gz -T ./.backup
-        #backup exits?
-        #movebackup
     else
-        echo "Create .backup file"
+        #touch "$file_path"
+        echo -e "   $file_name file created in $file_path"
     fi
 }
 
@@ -53,27 +58,43 @@ getFileContent() {
     local user_path="/home/${user_name}/"
     if [ -d "$user_path" ]
     then
+        echo "$user_name"
         readBackupFile "$user_path" "$user_name"
     else
         echo "$user_name user could not be found"
     fi
 }
 
-backupExtract() {
-    local backup_path="/var/backup.tar.gz"
-    local extract_path="/tmp/backup"
-    local bool_exist=false
+compressBackup() {
+    echo "Test"
+}
 
+backupExtract() {
     if ! [ -d "$extract_path" ]
     then
-        mkdir "$extract_path"
+        #mkdir "$extract_path"
+        echo "$extract_path Path created"
     fi
 
-    if [ -f "" ]
+    if [ -f "$backup_path" ]
+    then
+        #tar -zxf "$backup_path" -C
+        echo "$backup_path is being extracted in $extract_path"
+    else
+        echo "$backup_path couldn't be found"
+    fi
 }
+
+backup_path="/var/backup.tar.gz"
+extract_path="/tmp/backup"
+file_input=$1
+backupExtract
+echo -e "\nStarting user packing...\n"
 
 while IFS= read -r line || [ -n "$line" ]
 do 
     [ -z "$line" ] && continue
     getFileContent "$line"
 done < "$file_input"
+
+compressBackup
