@@ -1,7 +1,13 @@
 #!/bin/bash
-# GitHub repo: git@github.com:SrAlch/conteroDaniel_os_CA.git
+
+# GitHub repo SSH: git@github.com:SrAlch/conteroDaniel_os_CA.git
+# GitHub repo HTTPS: https://github.com/SrAlch/conteroDaniel_os_CA.git
 
 checkAndCreateFile() {
+    # Checks if the given file or folder exists. If it doesn't will create a
+    # file from the given path with zero lenght (assuming that no non existing
+    # path is a folder) 
+
     local file_path=$1
     if ! [ -f "$file_path" ]
     then
@@ -14,18 +20,34 @@ checkAndCreateFile() {
 }
 
 fileComparing() {
+    # Compares the content of the current "/home/<user>" with the content on 
+
     local file_name=$1
     local tmp_user="$extract_path/$2"
+    local final_path=""
 
-    if [ -f "$tmp_user/" ]
+    if [ -d "$tmp_user" ]
     then
         echo "test"
     else
         echo "test"
     fi
+
+    if [ -f "$tmp_user/$file_name" ]
+    then
+        echo "test"
+    else
+        echo "test"
+    fi
+
+    
 }
 
 readBackupFile() {
+    # Checks if ".backup" file exists for the given user if not, creates file 
+    # with zero lenght. If the file exists reads each line inside it cleaning
+    # paths.
+
     local user_path=$1
     local user_name=$2
     local file_name=".backup"
@@ -54,6 +76,9 @@ readBackupFile() {
 }
 
 getFileContent() {
+    # Checks if given name exists as user, otherwise finish the function with
+    # msg that user couldn't be found.
+
     local user_name=$1
     local user_path="/home/${user_name}/"
     if [ -d "$user_path" ]
@@ -70,6 +95,10 @@ compressBackup() {
 }
 
 backupExtract() {
+    # Checks if "/tmp/backup" exists (extraction path given) and creates the path
+    # if doesn't exist. Then checks if "/var/backup.tar.gz" exists, extracting 
+    # it on the given location, otherwise promnts msg couldnt be found.
+
     if ! [ -d "$extract_path" ]
     then
         #mkdir "$extract_path"
