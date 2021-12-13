@@ -20,7 +20,9 @@ checkAndCreateFile() {
 }
 
 fileComparing() {
-    # Compares the content of the current "/home/<user>" with the content on 
+    # Checks if the <user> tmp folder exists, otherwise creates it
+    # Compares the content of the current "/home/<user>" with the content on
+    # "/tmp/backup/<user>" and increste to last version in case of existing files 
 
     local file_path="$1"
     local file_name=""
@@ -34,14 +36,14 @@ fileComparing() {
 
     if [ -f "$tmp_user/$file_name" ]
     then
-        
+
         echo "test"
     else
         local final_path="$tmp_user/$file_name"
         echo "test"
     fi
 
-    cp "$file_path" "$final_path"
+    #cp "$file_path" "$final_path"
 }
 
 readBackupFile() {
@@ -92,7 +94,10 @@ getFileContent() {
 }
 
 compressBackup() {
-    echo "Test"
+    # Compress back the backup.tr.gz file after all the operations are completed
+
+    #tar -zcf "$backup_path" "$extract_path"
+    echo "File $backup_path is being compressed"
 }
 
 backupExtract() {
@@ -108,7 +113,7 @@ backupExtract() {
 
     if [ -f "$backup_path" ]
     then
-        #tar -zxf "$backup_path" -C
+        #tar -zxf "$backup_path" -C "$extract_path"
         echo "$backup_path is being extracted in $extract_path"
     else
         echo "$backup_path couldn't be found"
@@ -117,7 +122,7 @@ backupExtract() {
 
 backup_path="/var/backup.tar.gz"
 extract_path="/tmp/backup"
-file_input=$1
+file_input=$1       # Input file as argument
 backupExtract
 echo -e "\nStarting user packing...\n"
 
@@ -128,3 +133,5 @@ do
 done < "$file_input"
 
 compressBackup
+
+echo -e "\nThe backup script is completed"
