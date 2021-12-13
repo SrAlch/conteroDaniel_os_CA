@@ -22,25 +22,26 @@ checkAndCreateFile() {
 fileComparing() {
     # Compares the content of the current "/home/<user>" with the content on 
 
-    local file_name=$1
+    local file_path="$1"
+    local file_name=""
+    file_name=$(basename "$file_path")
     local tmp_user="$extract_path/$2"
-    local final_path=""
-
-    if [ -d "$tmp_user" ]
+    if ! [ -d "$tmp_user" ]
     then
-        echo "test"
-    else
+        #mkdir "$tmp_user"
         echo "test"
     fi
 
     if [ -f "$tmp_user/$file_name" ]
     then
+        
         echo "test"
     else
+        local final_path="$tmp_user/$file_name"
         echo "test"
     fi
 
-    
+    cp "$file_path" "$final_path"
 }
 
 readBackupFile() {
@@ -54,20 +55,20 @@ readBackupFile() {
     local file_path="${user_path}${file_name}"
     if [ -f "$file_path" ]
     then
-        echo -e "   $file_name file found $file_path"
+        echo -e "   $file_name file found in $file_path"
         cd "$user_path" || exit
         while IFS= read -r line || [ -n "$line" ]
         do 
-            [ -z "$line" ] && continue 
+            [ -z "$line" ] && continue
             if [ "${line:0:1}" == "." ]
             then
-                checkAndCreateFile "$line"
-                fileComparing "$line" "$user_name"
+                local raw_path="$line"
             elif [ "${line:0:1}" == "~" ]
             then
-                local abs_path="${user_path}${line:2}"
-                checkAndCreateFile "$abs_path"
-            fi           
+                local raw_path="${user_path}${line:2}"
+            fi
+                checkAndCreateFile "$raw_path"
+                fileComparing "$raw_path" "$user_name"         
         done < "$file_path"
     else
         #touch "$file_path"
