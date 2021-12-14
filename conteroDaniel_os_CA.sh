@@ -36,10 +36,20 @@ fileComparing() {
 
     if [ -f "$tmp_user/$file_name" ]
     then
-
+        if [[ "$file_name" =~ .+\.[0-9]+ ]]
+        then
+            
+            local num_files=$(find "$tmp_user" -name "${part_name[-1]}*")
+            num_files++
+            echo "test"
+        else
+            echo "test"
+        fi
+    elif [ -d "$tmp_user/$file_name" ]
+    then
+        local final_path="$tmp_user/$file_name"
         echo "test"
     else
-        local final_path="$tmp_user/$file_name"
         echo "test"
     fi
 
