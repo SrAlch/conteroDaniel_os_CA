@@ -20,22 +20,11 @@ checkAndCreateFile() {
     fi
 }
 
-fileComparing() {
-    # Checks if the <user> tmp folder exists, otherwise creates it
-    # Compares the content of the current "/home/<user>" with the content on
-    # "/tmp/backup/<user>" and increste to last version in case of existing files 
-
-    local file_path file_dir file_name final_dir name_part version_part
-    local num_files final_path
-    file_path="$1"
-    file_dir=$(dirname "$file_path")
-    file_name=$(basename "$file_path")
-    final_dir="$extract_path/$2/${file_dir:2}"
-    if ! [ -d "final_dirr" ]
-    then
-        #mkdir "$tmp_user"
-        echo "Created $final_dir"
-    fi
+fileCopy() {
+    # With the given path for /tmp/backup tries to validate with regEx the 
+    # versioning of the file on that path (filename.'version_number'). Can 
+    # capture files with or without extension. Once validated copies the new 
+    #formed path with the corresponding version, without changing /home/<user>
 
     if [ -f "$final_dir/$file_name" ]
     then
@@ -59,8 +48,39 @@ fileComparing() {
     else
         echo "test"
     fi
-    echo "$file_path copied to $final_path"
     #cp "$file_path" "$final_path"
+    echo "$file_path copied to $final_path"
+    
+}
+
+fileComparing() {
+    # Checks if the <user> tmp folder exists, otherwise creates it
+    # Compares the content of the current "/home/<user>" with the content on
+    # "/tmp/backup/<user>" and increste to last version in case of existing files 
+
+    local file_path file_dir file_name final_dir name_part version_part
+    local num_files final_path inside_file user_name
+    file_path="$1"
+    user_name="$2"
+    if [ -f "$file_path" ]
+    then
+        file_dir=$(dirname "$file_path")
+        file_name=$(basename "$file_path")
+        final_dir="$extract_path/$user_name/${file_dir:2}"
+        #[ ! -e "$final_dir" ] && mkdir -p "$final_dir" && echo "Created $final_dir"
+        fileCopy 
+    elif [ -d "$file_path" ]
+    then
+        file_dir="$file_path"
+        final_dir="$extract_path/$user_name/${file_dir:2}"
+        #[ ! -e "$final_dir" ] && mkdir -p "$final_dir" && echo "Created $final_dir"
+        for inside_file in "$file_path"/*
+        do
+            fileComparing "$inside_file" "$user_name"
+        done
+    else
+        echo "There is an error with $file_path"
+    fi
 }
 
 readBackupFile() {
@@ -85,7 +105,7 @@ readBackupFile() {
                 raw_path="$line"
             elif [ "${line:0:1}" == "~" ]
             then
-                raw_path="${user_path}${line:2}"
+                raw_path=".${line:2}"
             fi
                 checkAndCreateFile "$raw_path"
                 fileComparing "$raw_path" "$user_name"         
