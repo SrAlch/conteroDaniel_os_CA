@@ -26,6 +26,8 @@ fileCopy() {
     # capture files with or without extension. Once validated copies the new 
     #formed path with the corresponding version, without changing /home/<user>
 
+    local final_dir file_name name_part version_part num_files final_path
+
     if [ -f "$final_dir/$file_name" ]
     then
         if [[ "$file_name" =~ .+\.[0-9]+ ]]
@@ -41,12 +43,13 @@ fileCopy() {
         else
             final_path="$final_dir/$file_name.1"
         fi
-    elif [ -d "$final_dir/$file_name" ]
-    then
-        final_path="$final_dir/$file_name"
-        echo "test"
     else
-        echo "test"
+        if [[ "$file_name" =~ .+\.[0-9]+ ]]
+        then
+            final_path="$final_dir/$file_name"
+        else
+            final_path="$final_dir/$file_name.1"
+        fi
     fi
     #cp "$file_path" "$final_path"
     echo "$file_path copied to $final_path"
@@ -58,7 +61,7 @@ fileComparing() {
     # Compares the content of the current "/home/<user>" with the content on
     # "/tmp/backup/<user>" and increste to last version in case of existing files 
 
-    local file_path file_dir file_name final_dir name_part version_part
+    local file_path file_dir file_name final_dir  
     local num_files final_path inside_file user_name
     file_path="$1"
     user_name="$2"
@@ -66,13 +69,13 @@ fileComparing() {
     then
         file_dir=$(dirname "$file_path")
         file_name=$(basename "$file_path")
-        final_dir="$extract_path/$user_name/${file_dir:2}"
+        final_dir="$EXTRACT_PATH/$user_name/${file_dir:2}"
         #[ ! -e "$final_dir" ] && mkdir -p "$final_dir" && echo "Created $final_dir"
         fileCopy 
     elif [ -d "$file_path" ]
     then
         file_dir="$file_path"
-        final_dir="$extract_path/$user_name/${file_dir:2}"
+        final_dir="$EXTRACT_PATH/$user_name/${file_dir:2}"
         #[ ! -e "$final_dir" ] && mkdir -p "$final_dir" && echo "Created $final_dir"
         for inside_file in "$file_path"/*
         do
@@ -136,7 +139,7 @@ compressBackup() {
     # Compress back the backup.tr.gz file after all the operations are completed
 
     #tar -zcf "$backup_path" "$extract_path"
-    echo "File $backup_path is being compressed"
+    echo "File $BACKUP_PATH is being compressed"
 }
 
 backupExtract() {
@@ -144,23 +147,23 @@ backupExtract() {
     # if doesn't exist. Then checks if "/var/backup.tar.gz" exists, extracting 
     # it on the given location, otherwise promnts msg couldnt be found.
 
-    if ! [ -d "$extract_path" ]
+    if ! [ -d "$EXTRACT_PATH" ]
     then
         #mkdir "$extract_path"
-        echo "$extract_path Path created"
+        echo "$EXTRACT_PATH Path created"
     fi
 
-    if [ -f "$backup_path" ]
+    if [ -f "$BACKUP_PATH" ]
     then
         #tar -zxf "$backup_path" -C "$extract_path"
-        echo "$backup_path is being extracted in $extract_path"
+        echo "$BACKUP_PATH is being extracted in $EXTRACT_PATH"
     else
-        echo "$backup_path couldn't be found"
+        echo "$BACKUP_PATH couldn't be found"
     fi
 }
 
-backup_path="/var/backup.tar.gz"
-extract_path="/tmp/backup"
+BACKUP_PATH="/var/backup.tar.gz"
+EXTRACT_PATH="/tmp/backup"
 file_input=$1       # Input file as argument
 backupExtract
 echo -e "\nStarting user packing...\n"
