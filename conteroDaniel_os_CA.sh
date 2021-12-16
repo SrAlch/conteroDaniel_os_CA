@@ -8,7 +8,8 @@ checkAndCreateFile() {
     # file from the given path with zero lenght (assuming that no non existing
     # path is a folder) 
 
-    local file_path=$1
+    local file_path
+    file_path=$1
     if ! [ -f "$file_path" ]
     then
         echo -e "       File couldn't be found, creating it with zero-lenght  $file_path"
@@ -24,10 +25,8 @@ fileComparing() {
     # Compares the content of the current "/home/<user>" with the content on
     # "/tmp/backup/<user>" and increste to last version in case of existing files 
 
-    local file_path
-    local file_dir
-    local file_name
-    local final_dir
+    local file_path file_dir file_name final_dir name_part version_part
+    local num_files final_path
     file_path="$1"
     file_dir=$(dirname "$file_path")
     file_name=$(basename "$file_path")
@@ -42,10 +41,6 @@ fileComparing() {
     then
         if [[ "$file_name" =~ .+\.[0-9]+ ]]
         then
-            local name_part
-            local version_part
-            local num_files
-            local final_path
             name_part="$(echo "$file_name" | grep -P '.*(?=\.)' -o)"
             version_part="$(echo "$file_name" | grep -P '(?<=\.)[0-9]+' -o)"
             num_files=$(find "$final_dir" -name "$name_part*" | wc -l)
@@ -73,10 +68,11 @@ readBackupFile() {
     # with zero lenght. If the file exists reads each line inside it cleaning
     # paths.
 
-    local user_path=$1
-    local user_name=$2
-    local file_name=".backup"
-    local file_path="${user_path}${file_name}"
+    local user_path user_name file_name file_path raw_path
+    user_path=$1
+    user_name=$2
+    file_name=".backup"
+    file_path="${user_path}${file_name}"
     if [ -f "$file_path" ]
     then
         echo -e "   $file_name file found in $file_path"
@@ -86,10 +82,10 @@ readBackupFile() {
             [ -z "$line" ] && continue
             if [ "${line:0:1}" == "." ]
             then
-                local raw_path="$line"
+                raw_path="$line"
             elif [ "${line:0:1}" == "~" ]
             then
-                local raw_path="${user_path}${line:2}"
+                raw_path="${user_path}${line:2}"
             fi
                 checkAndCreateFile "$raw_path"
                 fileComparing "$raw_path" "$user_name"         
@@ -104,8 +100,9 @@ getFileContent() {
     # Checks if given name exists as user, otherwise finish the function with
     # msg that user couldn't be found.
 
-    local user_name=$1
-    local user_path="/home/${user_name}/"
+    local user_name user_path
+    user_name=$1
+    user_path="/home/${user_name}/"
     if [ -d "$user_path" ]
     then
         echo "$user_name"
