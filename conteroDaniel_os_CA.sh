@@ -24,35 +24,47 @@ fileComparing() {
     # Compares the content of the current "/home/<user>" with the content on
     # "/tmp/backup/<user>" and increste to last version in case of existing files 
 
-    local file_path="$1"
-    local file_name=""
+    local file_path
+    local file_dir
+    local file_name
+    local final_dir
+    file_path="$1"
+    file_dir=$(dirname "$file_path")
     file_name=$(basename "$file_path")
-    local tmp_user="$extract_path/$2"
-    if ! [ -d "$tmp_user" ]
+    final_dir="$extract_path/$2/${file_dir:2}"
+    if ! [ -d "final_dirr" ]
     then
         #mkdir "$tmp_user"
-        echo "test"
+        echo "Created $final_dir"
     fi
 
-    if [ -f "$tmp_user/$file_name" ]
+    if [ -f "$final_dir/$file_name" ]
     then
         if [[ "$file_name" =~ .+\.[0-9]+ ]]
         then
-            
-            local num_files=$(find "$tmp_user" -name "${part_name[-1]}*")
-            num_files++
-            echo "test"
+            local name_part
+            local version_part
+            local num_files
+            local final_path
+            name_part="$(echo "$file_name" | grep -P '.*(?=\.)' -o)"
+            version_part="$(echo "$file_name" | grep -P '(?<=\.)[0-9]+' -o)"
+            num_files=$(find "$final_dir" -name "$name_part*" | wc -l)
+            num_files=$((++num_files))
+            if (( num_files > version_part ))
+            then
+                final_path="$final_dir/$name_part.$num_files"
+            fi
         else
-            echo "test"
+            final_path="$final_dir/$file_name.1"
         fi
-    elif [ -d "$tmp_user/$file_name" ]
+    elif [ -d "$final_dir/$file_name" ]
     then
-        local final_path="$tmp_user/$file_name"
+        final_path="$final_dir/$file_name"
         echo "test"
     else
         echo "test"
     fi
-
+    echo "$file_path copied to $final_path"
     #cp "$file_path" "$final_path"
 }
 
