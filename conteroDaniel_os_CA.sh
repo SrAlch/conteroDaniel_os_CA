@@ -133,7 +133,7 @@ getFileContent() {
     user_path="/home/${user_name}/"
     if [ -d "$user_path" ]
     then
-        echo "$user_name"
+        echo "Analyzing user: $user_name"
         readBackupFile "$user_path" "$user_name"
     else
         echo "$user_name user could not be found"
